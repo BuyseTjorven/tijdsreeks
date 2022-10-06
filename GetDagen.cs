@@ -16,7 +16,7 @@ namespace MCT.functions
     public static class DagenFunctions
     {
         [FunctionName("GetDagen")]
-        public static async Task<IActionResult> Run(
+        public static async Task<IActionResult> GetDagen(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "days")] HttpRequest req,
             ILogger log)
         {
@@ -41,14 +41,14 @@ namespace MCT.functions
             return new OkObjectResult(dagen);
         }
         [FunctionName("Getvisitors")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "visitors/Day")] HttpRequest req,
+        public static async Task<IActionResult> GetVisitors(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "visitors/{day}")] HttpRequest req,
             string Day,
             ILogger log)
         {
             try
             {
-                string connectionString = Environment.GetEnvironmentVariable("ConnectionsString");
+                string connectionString = Environment.GetEnvironmentVariable("ConnectionString");
                 List<Visit> visits = new List<Visit>();
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
@@ -57,7 +57,7 @@ namespace MCT.functions
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
-                        command.CommandText = "SELECT Tijdstip, AantalBezoekers FROM Bezoekers WHERE DagVanDeWaak = @dag";
+                        command.CommandText = "SELECT TijdstipDag, AantalBezoekers FROM Bezoekers WHERE DagVanDeWeek = @dag";
                         command.Parameters.AddWithValue("@dag", Day);
 
                         SqlDataReader reader = await command.ExecuteReaderAsync();
